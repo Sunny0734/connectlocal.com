@@ -23,19 +23,17 @@ const auth = getAuth(app);
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-      const uid = user.uid;
       console.log(user);
       const profilePicture = document.getElementById("userProfilePicture");
       const personName = document.getElementById("personName");
       const email = document.getElementById("email");
       const phoneNumber = document.getElementById("phoneNumber");
-      const dateOfBirth = document.getElementById("dateOfBirth");
 
       // set user Name
       if(user.displayName) {
         personName.innerText = user.displayName;
       } else{
-        personName.innerText = 'Harshith Reddy'
+        personName.innerText = 'User'
       }
 
       // Set profile picture
@@ -49,10 +47,9 @@ onAuthStateChanged(auth, (user) => {
       }
 
       // Set other user details
+      phoneNumber.innerText = user.phoneNumber || 'No phone number available';
       personName.innerText = user.displayName;
       email.innerText = user.email;
-      phoneNumber.innerText = user.PhoneNumber || 'Not Provided!';
-      dateOfBirth.innerText = user.dateOfBirth || 'Not Provided!';
   } else {
       window.location.href = "index.html";
   }

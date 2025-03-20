@@ -3,31 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test</title>
-    <style>
-        img {
-            height: 200px;
-            width: 200px;
-            border: 2px black solid;
-        }
-    </style>
+    <title>Upload Image & Save Text</title>
 </head>
 <body>
-    <label>Image Name</label>
-    <input type="text" id="namebox"><label id="extlab"></label><br><br>
-    <img id="myimg"><label id="upprogress"></label><br><br>
-    <button id="selbtn">Select Image</button>
-    <button id="upbtn">Upload Image</button>
-    <button id="downbtn">Retrieve Image</button>
+
+    <h2>Upload Image & Save Text</h2>
+    <input type="file" id="fileInput" /><br><br>
+    <input type="text" id="textInput" placeholder="Enter some text..." /><br><br>
+    <button id="uploadBtn">Upload</button>
+
+    <p id="message"></p>
+    <img id="uploadedImage" style="display: none; max-width: 300px;" />
+
+    <h3>Uploaded Images:</h3>
+    <div id="imagesContainer"></div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-        import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } 
-            from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+        // Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // Firebase Configuration (Replace with your Firebase project details)
         const firebaseConfig = {
             apiKey: "AIzaSyByiwoUPA4vVstdBByIaTaz-WMVAnZaggc",
             authDomain: "catering-connectlocal.firebaseapp.com",
+            databaseURL: "https://catering-connectlocal-default-rtdb.firebaseio.com",
             projectId: "catering-connectlocal",
             storageBucket: "catering-connectlocal.appspot.com",
             messagingSenderId: "813290457794",
@@ -37,91 +38,92 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const storage = getStorage(app);
+        const db = getFirestore(app); // Initialize Firestore
 
-        // -------------------VARIABLES & REFERENCES -------------------//
-        var files = [];
-        var reader = new FileReader();
+        // Upload Button Click Event
+        document.getElementById("uploadBtn").addEventListener("click", async () => {
+            const fileInput = document.getElementById("fileInput");
+            const textInput = document.getElementById("textInput").value.trim();
+            const message = document.getElementById("message");
+            const uploadedImage = document.getElementById("uploadedImage");
 
-        var namebox = document.getElementById('namebox');
-        var extlab = document.getElementById('extlab');
-        var myimg = document.getElementById('myimg');
-        var proglab = document.getElementById('upprogress');
-        var selBtn = document.getElementById('selbtn');
-        var upBtn = document.getElementById('upbtn');
-        var downBtn = document.getElementById('downbtn');
-        
-        var input = document.createElement('input');
-        input.type = 'file';
+            const file = fileInput.files[0];
 
-        input.onchange = e => {
-            files = e.target.files;
-
-            var extension = getFileExt(files[0]);
-            var name = getFileName(files[0]);
-
-            namebox.value = name;
-            extlab.innerHTML = extension;
-
-            reader.readAsDataURL(files[0]);
-        }
-
-        reader.onload = function() {
-            myimg.src = reader.result;
-        }
-
-        //------------------Selection----------------//
-
-        selBtn.onclick = function() {
-            input.click();
-        }
-
-        function getFileExt(file) {
-            var temp = file.name.split('.');
-            var ext = temp.slice((temp.length - 1), temp.length);
-            return '.' + ext[0];
-        }
-
-        function getFileName(file) {
-            var temp = file.name.split('.');
-            var fname = temp.slice(0, -1).join('.');
-            return fname;
-        }
-
-        // Upload Process
-
-        async function uploadProcess() {
-            if (files.length === 0) {
-                alert("No file selected.");
+            if (!file) {
+                message.textContent = "⚠️ Please select a file first!";
                 return;
             }
 
-            var imgToUpload = files[0];
-            var imgName = namebox.value + extlab.innerHTML;
+            if (!textInput) {
+                message.textContent = "⚠️ Please enter some text!";
+                return;
+            }
 
-            const metaData = {
-                contentType: imgToUpload.type
-            };
+            const storageRef = ref(storage, `images/${file.name}`);
 
-            const storageRef = sRef(storage, "Images/" + imgName);
-            const uploadTask = uploadBytesResumable(storageRef, imgToUpload, metaData);
+            try {
+                message.textContent = "Uploading...";
+                const snapshot = await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                
+                // Store image URL and text in Firestore
+                await addDoc(collection(db, "uploads"), {
+                    text: textInput,
+                    imageUrl: downloadURL,
+                    timestamp: new Date()
+                });
 
-            uploadTask.on('state_changed', 
-                (snapshot) => {
-                    var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    proglab.innerHTML = "Upload " + progress.toFixed(2) + "%";
-                },
-                (error) => {
-                    alert("Error: Image not uploaded! " + error.message);
-                },
-                () => {
-                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        console.log("File available at", downloadURL);
-                    });
-                }
-            );
+                message.textContent = "✅ Image & Text saved successfully!";
+                console.log("Stored in Firestore:", { text: textInput, imageUrl: downloadURL });
+
+                // Display uploaded image
+                uploadedImage.src = downloadURL;
+                uploadedImage.style.display = "block";
+                
+                // Fetch and display all images and text again after upload
+                fetchImages();
+            } catch (error) {
+                console.error("Error writing document:", error);
+                message.textContent = `❌ Upload failed: ${error.message}`;
+            }
+        });
+
+        // Fetch and display images and text from Firestore
+        async function fetchImages() {
+            const imagesContainer = document.getElementById("imagesContainer");
+            imagesContainer.innerHTML = ""; // Clear existing images
+
+            const querySnapshot = await getDocs(collection(db, "uploads"));
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                
+                // Create a container for each image and text
+                const itemContainer = document.createElement("div");
+                itemContainer.style.marginBottom = "20px"; // Add some spacing between items
+
+                // Create an image element
+                const img = document.createElement("img");
+                img.src = data.imageUrl;
+                img.style.maxWidth = "300px";
+                img.style.display = "block"; // Display as block for better layout
+                
+                // Create a text element
+                const text = document.createElement("p");
+                text.textContent = data.text;
+                text.style.fontWeight = "bold"; // Style the text (optional)
+
+                // Append image and text to the container
+                itemContainer.appendChild(img);
+                itemContainer.appendChild(text);
+                
+                // Append the container to the imagesContainer
+                imagesContainer.appendChild(itemContainer);
+            });
         }
 
-        upBtn.onclick = uploadProcess;
+        // Call fetchImages function on page load
+        fetchImages();
     </script>
+
 </body>
 </html>
