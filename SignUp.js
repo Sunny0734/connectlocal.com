@@ -51,6 +51,6 @@ submit.addEventListener("click", function (event) {
       window.location.href = "login.html";
     })
     .catch((error) => {
-      alert("The Email Entered Is Already In Use, Try Logging In!!");
+      alert("Error Occured Please Try Again");
     });
 });
