@@ -1,91 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SignUp - ConnectLocal</title>
-    <link rel="stylesheet" href="style.css" />
-    <script type="module" src="SignUp.js" defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SignUp - ConnectLocal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="icon" href="img/logo1.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-    <link rel="icon" href="img/logo1.png">
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-    <style>
-      .password-container {
-        position: relative;
-        width: 100%;
-      }
+    .container {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      padding: 40px;
+      text-align: center;
+    }
 
-      .password-container input {
-        width: calc(100% - 20px); /* Adjust the width of the input field */
-        padding-right: 30px; /* Add padding to avoid overlap with the icon */
-      }
+    .logo {
+      max-width: 150px;
+      margin-bottom: 20px;
+    }
 
-      .password-container i {
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-      }
-    </style>
-  </head>
-  <body>
-    <!-- <div class="background">
-      <div class="shape"></div>
-      <div class="shape"></div>
-    </div> -->
+    h3 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
 
-    <form class="container">
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 5px;
+      color: #555;
+      font-size: 14px;
+      font-weight: 500;
+    }
 
-      <img src="img/Screenshot 2023-09-29 at 1.54.52 PM.png" height="70px" style="margin-left: 65px;">
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border: 1px solid #e1e1e1;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
 
-      <h3>SignUp</h3>
+    input:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
 
-      <label for="username">
-        Username
-        <input type="email" placeholder="Email or Phone" id="email" required />
-      </label>
+    .password-container {
+      position: relative;
+      width: 100%;
+    }
 
-      <label for="password">
-        Password  (atleast 6 characters)
-        <div class="password-container">
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Password"
-            required
-          />
-          <i class="fa fa-eye" id="togglePassword" style="cursor: pointer"></i>
-        </div>
-      </label>
-      
-      <button style="margin-top: 100px;" id="submit" name="submit" type="submit">Create Account</button>
+    .password-container input {
+      padding-right: 40px;
+    }
 
-      <div style="margin-top: 50px;" class="form">
-        <p>Already have an account? <a style="color: rgb(0, 174, 255);text-decoration: none;font-weight: bold;" href="login.html">LogIn</a></p>
+    .password-container i {
+      position: absolute;
+      top: 15px; /* Changed from 50% and removed transform for precise positioning */
+      right: 15px;
+      color: #777;
+      cursor: pointer;
+      height: 20px; /* Fixed height */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .password-hint {
+      text-align: left;
+      font-size: 12px;
+      color: #777;
+      margin-top: -15px;
+      margin-bottom: 20px;
+    }
+
+    .form p {
+      margin: 15px 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .form a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .form a:hover {
+      color: #2980b9;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 20px;
+      width: 100%;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <img src="img/Screenshot 2023-09-29 at 1.54.52 PM.png" class="logo" alt="ConnectLocal Logo">
+
+    <h3>Create Account</h3>
+
+    <form id="signupForm">
+      <label for="email">Email or Phone</label>
+      <input type="email" id="email" placeholder="Enter your email" required />
+
+      <label for="password">Password</label>
+      <div class="password-container">
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+        />
+        <i class="far fa-eye" id="togglePassword"></i>
+      </div>
+      <div class="password-hint">Password must be at least 6 characters</div>
+
+      <button id="submit" name="submit" type="submit">Create Account</button>
+
+      <div class="form" style="margin-top: 20px;">
+        <p>Already have an account? <a href="login.html">Sign In</a></p>
       </div>
     </form>
-    <script>
-      document.addEventListener("DOMContentLoaded", (event) => {
-        const togglePassword = document.querySelector("#togglePassword");
-        const password = document.querySelector("#password");
+  </div>
 
-        togglePassword.addEventListener("click", function (e) {
-          // toggle the type attribute
-          const type =
-            password.getAttribute("type") === "password" ? "text" : "password";
-          password.setAttribute("type", type);
-          // toggle the eye / eye slash icon
-          if (type === "password") {
-            this.classList.remove("fa-eye-slash");
-            this.classList.add("fa-eye");
-          } else {
-            this.classList.remove("fa-eye");
-            this.classList.add("fa-eye-slash");
-          }
-        });
+  <script>
+    document.addEventListener("DOMContentLoaded", (event) => {
+      const togglePassword = document.querySelector("#togglePassword");
+      const password = document.querySelector("#password");
+
+      togglePassword.addEventListener("click", function (e) {
+        // toggle the type attribute
+        const type = password.getAttribute("type") === "password" ? "text" : "password";
+        password.setAttribute("type", type);
+        // toggle the eye / eye slash icon
+        this.classList.toggle("fa-eye");
+        this.classList.toggle("fa-eye-slash");
       });
-    </script>
-  </body>
+    });
+  </script>
+  <script type="module" src="SignUp.js" defer></script>
+</body>
 </html>

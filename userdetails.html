@@ -92,7 +92,7 @@
               <label for="exampleFormControlInput1" class="form-label"
                 >Last Name</label
               >
-              <input type="email" class="form-control" id="ModLastName" />
+              <input type="text" class="form-control" id="ModLastName" />
             </div>
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label"
@@ -104,13 +104,13 @@
               <label for="exampleFormControlInput1" class="form-label"
                 >Phone Number</label
               >
-              <input type="email" class="form-control" id="ModPhoneNumber" />
+              <input type="text" class="form-control" id="ModPhoneNumber" />
             </div>
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label"
                 >Comments</label
               >
-              <input type="email" class="form-control" id="ModComments" />
+              <input type="text" class="form-control" id="ModComments" />
             </div>
           </div>
           <div class="modal-footer">
@@ -141,8 +141,10 @@
       var usrNo = 0;
       var usrList = [];
       var tbody = document.getElementById("tbody1");
+      var currentEditKey = null;
 
       function AddItemToTable(
+        key,
         FirstName,
         LastName,
         EmailId,
@@ -158,7 +160,16 @@
         let td6 = document.createElement("td");
         let td7 = document.createElement("td");
 
-        usrList.push([FirstName, LastName, EmailId, PhoneNumber, Comments]);
+        // Store data as objects with Firebase keys
+        usrList.push({
+          key,
+          FirstName, 
+          LastName, 
+          EmailId, 
+          PhoneNumber, 
+          Comments
+        });
+        
         td1.innerHTML = ++usrNo;
         td2.innerHTML = FirstName;
         td3.innerHTML = LastName;
@@ -186,8 +197,6 @@
         td7.appendChild(EditButton);
         td7.appendChild(DelButton);
 
-        td7.appendChild(EditButton, DelButton);
-
         trow.appendChild(td1);
         trow.appendChild(td2);
         trow.appendChild(td3);
@@ -197,18 +206,6 @@
         trow.appendChild(td7);
 
         tbody1.appendChild(trow);
-      }
-
-      function AddAllItemsToTable(contactForm) {
-        contactForm.forEach((element, index) => {
-          AddItemToTable(
-            element.FirstName,
-            element.LastName,
-            element.EmailId,
-            element.PhoneNumber,
-            element.Comments
-          );
-        });
       }
 
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
@@ -221,6 +218,7 @@
         set,
         update,
         remove,
+        push,
       } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
       const firebaseConfig = {
@@ -236,87 +234,36 @@
 
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
-
       const db = getDatabase();
 
-      function GetAllDataOnce() {
-        var users = [];
-        tbody.innerHTML = "";
-        const dbRef = ref(db, "contactForm");
-
-        get(dbRef)
-          .then((snapshot) => {
-            snapshot.forEach((childSnapshot) => {
-              users.push(childSnapshot.val());
-            });
-
-            AddAllItemsToTable(users);
-          })
-          .catch((error) => {
-            console.error("Error getting data:", error);
-          });
-      }
-      window.onload = GetAllDataOnce;
+      // Real-time listener for database changes
       const SelectAllDataRealtime = () => {
         const dbRef = ref(db, "contactForm");
         onValue(dbRef, (snapshot) => {
           usrList = [];
-          tbody.innerHTML = ""
-          snapshot.forEach((user) => {
-            usrList.push(user.val());
+          tbody.innerHTML = "";
+          usrNo = 0; // Reset counter
+          
+          snapshot.forEach((childSnapshot) => {
+            const key = childSnapshot.key;
+            const data = childSnapshot.val();
+            
+            AddItemToTable(
+              key,
+              data.FirstName,
+              data.LastName,
+              data.EmailId,
+              data.PhoneNumber,
+              data.Comments
+            );
           });
-          AddAllItemsToTable;
         });
       };
 
       window.onload = () => {
-        GetAllDataOnce();
         SelectAllDataRealtime();
-      }
-
-      function Select_AllData() {
-        usrNo = 0;
-        document.getElementById("tbody1").innerHTML = "";
-        firebase
-          .database()
-          .ref("contactForm" + PhoneNumber.value)
-          .once("value", function (snapshot) {
-            snapshot.forEach(function (childSnapshot) {
-              var FirstName = childSnapshot.val().FirstName;
-              var LastName = childSnapshot.val().LastName;
-              var EmailId = childSnapshot.val().EmailId;
-              var PhoneNumber = childSnapshot.val().PhoneNumber;
-              var Comments = childSnapshot.val().Comments;
-              AddItemToTable(
-                FirstName,
-                LastName,
-                EmailId,
-                PhoneNumber,
-                Comments
-              );
-            });
-          });
-      }
-
-      window.FillTboxes = (index) => {
-        if (index == null) {
-          ModFirstName.value = "";
-          ModLastName.value = "";
-          ModEmail.value = "";
-          ModPhoneNumber.value = "";
-          ModComments.value = "";
-          BTNmodAdd.style.display = "inline-block";
-          BTNmodUpd.style.display = "none";
-          BTNmodDel.style.display = "none";
-        } else {
-          --index;
-          ModFirstName.value = usrList[index][0];
-          ModLastName.value = usrList[index][1];
-          ModEmail.value = usrList[index][2];
-          ModPhoneNumber.value = usrList[index][3];
-          ModComments.value = usrList[index][4];
-        }
       };
+
       let modXButton = document.getElementById("modXButton");
       let actionLabel = document.getElementById("actionLabel");
       let actionBtn = document.getElementById("actionBtn");
@@ -328,6 +275,11 @@
       let addBtn = document.getElementById("add-0");
 
       const LoadModal = (event) => {
+        // Remove previous event listeners to prevent multiple bindings
+        actionBtn.removeEventListener("click", AddData);
+        actionBtn.removeEventListener("click", UpdData);
+        actionBtn.removeEventListener("click", DelData);
+        
         var targetId =
           event.target.id.length > 1
             ? event.target.id
@@ -335,8 +287,8 @@
 
         let string = targetId.split("-");
         let mode = string[0];
-        let selectedIndex = string[1] - 1;
-
+        let selectedIndex = parseInt(string[1]) - 1;
+        
         actionBtn.disabled = false;
 
         if (mode === "add") {
@@ -359,8 +311,11 @@
         } else if (mode === "edit") {
           actionBtn.className = "btn btn-lg btn-primary";
           actionLabel.innerText = "Edit Record";
-          actionBtn.innerText = "update";
+          actionBtn.innerText = "Update";
           actionBtn.addEventListener("click", UpdData);
+
+          // Store the Firebase key for this record
+          currentEditKey = usrList[selectedIndex].key;
 
           ModFirstName.value = usrList[selectedIndex].FirstName;
           ModLastName.value = usrList[selectedIndex].LastName;
@@ -368,7 +323,7 @@
           ModPhoneNumber.value = usrList[selectedIndex].PhoneNumber;
           ModComments.value = usrList[selectedIndex].Comments;
 
-          ModFirstName.disabled = true;
+          ModFirstName.disabled = false; // Allow editing all fields
           ModLastName.disabled = false;
           ModEmail.disabled = false;
           ModPhoneNumber.disabled = false;
@@ -378,6 +333,9 @@
           actionLabel.innerText = "Delete Record";
           actionBtn.innerText = "Confirm Delete";
           actionBtn.addEventListener("click", DelData);
+
+          // Store the Firebase key for this record
+          currentEditKey = usrList[selectedIndex].key;
 
           ModFirstName.value = usrList[selectedIndex].FirstName;
           ModLastName.value = usrList[selectedIndex].LastName;
@@ -409,7 +367,7 @@
           return;
         }
 
-        // Check if EmailId is a valid email (contains '@')
+        // Check if EmailId is a valid email
         if (!isValidEmail(email)) {
           alert("Please enter a valid email address.");
           actionBtn.disabled = false;
@@ -423,36 +381,23 @@
           return;
         }
 
-        // Check if FirstName already exists
-        const dbRef = ref(db, "contactForm");
-        get(child(dbRef,  ))
-          .then((snapshot) => {
-            if (snapshot.exists()) {
-              // FirstName already exists, handle accordingly
-              alert(
-                "This First Name is already in use. Please choose another."
-              );
-              actionBtn.disabled = false;
-            } else {
-              // FirstName does not exist, proceed to add
-              set(ref(db, "contactForm/" + firstName), {
-                FirstName: firstName,
-                LastName: lastName,
-                EmailId: email,
-                PhoneNumber: phoneNumber,
-                Comments: comments,
-              })
-                .then(() => {
-                  modXButton.click();
-                  location.reload();
-                })
-                .catch((error) => {
-                  console.error("Error adding document: ", error);
-                });
-            }
+        // Create a new record with an auto-generated key
+        const newContactRef = push(ref(db, "contactForm"));
+        
+        set(newContactRef, {
+          FirstName: firstName,
+          LastName: lastName,
+          EmailId: email,
+          PhoneNumber: phoneNumber,
+          Comments: comments,
+        })
+          .then(() => {
+            modXButton.click();
+            // No need for reload, real-time listener will update
           })
           .catch((error) => {
-            console.error("Error checking if FirstName exists: ", error);
+            console.error("Error adding document: ", error);
+            actionBtn.disabled = false;
           });
       };
 
@@ -463,70 +408,93 @@
 
       // Function to check if a string consists only of numeric digits
       function isNumeric(str) {
-        if (typeof str !== "string") return false; // We only process strings!
+        if (typeof str !== "string") return false;
         return /^\d+$/.test(str);
       }
 
       const UpdData = () => {
         actionBtn.disabled = true;
-        let users = {};
-        users["contactForm/" + ModPhoneNumber.value + "/FirstName"] =
-          ModFirstName.value;
-        users["contactForm/" + ModPhoneNumber.value + "/EmailId"] =
-          ModEmail.value;
-        users["contactForm/" + ModPhoneNumber.value + "/LastName"] =
-          ModLastName.value;
-        users["contactForm/" + ModPhoneNumber.value + "/Comments"] =
-          ModComments.value;
+        
+        const firstName = ModFirstName.value.trim();
+        const lastName = ModLastName.value.trim();
+        const email = ModEmail.value.trim();
+        const phoneNumber = ModPhoneNumber.value.trim();
+        const comments = ModComments.value.trim();
+        
+        // Check if any field is empty
+        if (!firstName || !lastName || !email || !phoneNumber || !comments) {
+          alert("Please fill in all fields.");
+          actionBtn.disabled = false;
+          return;
+        }
+        
+        // Check if EmailId is a valid email
+        if (!isValidEmail(email)) {
+          alert("Please enter a valid email address.");
+          actionBtn.disabled = false;
+          return;
+        }
+        
+        // Check if PhoneNumber is numeric
+        if (!isNumeric(phoneNumber)) {
+          alert("Please enter a valid phone number (only digits).");
+          actionBtn.disabled = false;
+          return;
+        }
 
-        update(ref(db, "contactForm/" + ModFirstName.value), {
-          FirstName: ModFirstName.value,
-          LastName: ModLastName.value,
-          EmailId: ModEmail.value,
-          PhoneNumber: ModPhoneNumber.value,
-          Comments: ModComments.value,
+        // Use the Firebase key to update the record
+        update(ref(db, "contactForm/" + currentEditKey), {
+          FirstName: firstName,
+          LastName: lastName,
+          EmailId: email,
+          PhoneNumber: phoneNumber,
+          Comments: comments,
         })
           .then(() => {
             modXButton.click();
-            location.reload();
+            // No need for reload, real-time listener will update
           })
           .catch((error) => {
             console.error("Error Updating Document: ", error);
+            actionBtn.disabled = false;
           });
       };
 
       const DelData = () => {
         actionBtn.disabled = true;
-        remove(ref(db, "contactForm/" + ModFirstName.value))
+        
+        // Use the Firebase key to delete the record
+        remove(ref(db, "contactForm/" + currentEditKey))
           .then(() => {
             modXButton.click();
-            location.reload();
+            // No need for reload, real-time listener will update
           })
           .catch((error) => {
             console.error("Error Deleting document: ", error);
+            actionBtn.disabled = false;
           });
       };
+      
       function DeleteAllData() {
         const dbRef = ref(db, "contactForm");
 
-        if(usrNo === 0 && usrList.length === 0){
-          alert("There is no data available to delete.")
+        if (usrNo === 0 && usrList.length === 0) {
+          alert("There is no data available to delete.");
           return;
         }
 
-        if(confirm("Are you sure you want to delete all the data?")){
+        if (confirm("Are you sure you want to delete all the data?")) {
           remove(dbRef)
             .then(() => {
-              console.log("All data deleted successfully.")
-              tbody1.innerHTML = ""
-              usrList = []
-              usrNo = 0
+              console.log("All data deleted successfully.");
+              // No need to manually clear the table, the real-time listener will do that
             })
             .catch((error) => {
-              console.error("Error deleting all data: ", error)
-            })
+              console.error("Error deleting all data: ", error);
+            });
         }
       }
+      
       document
         .getElementById("delete-all-data")
         .addEventListener("click", function () {
@@ -534,7 +502,6 @@
         });
 
       addBtn.addEventListener("click", LoadModal);
-      window.addEventListener("load", SelectAllDataRealtime);
     </script>
   </body>
 </html>

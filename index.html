@@ -588,7 +588,7 @@
 
             <a class="dropdown-item sub-menu-link sub-menu-link3" href="#"><p>Settings</p> </a>
           <div class="dropdown-divider"></div>
-        <a class="dropdown-item sub-menu-link sub-menu-link4" href="login.html"><p>SignOut</p></a>
+        <a class="dropdown-item sub-menu-link sub-menu-link4" id="logout-btn" href="login.html"><p>SignOut</p></a>
         </div>
       </li>
 		  </div>
@@ -771,6 +771,19 @@
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
       }
+      document.addEventListener('DOMContentLoaded', function() {
+  // Check if user is authenticated
+  checkAuth();
+  
+  // Set up logout button if it exists
+  const logoutButton = document.getElementById('logout-btn');
+  if (logoutButton) {
+    logoutButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      logout();
+    });
+  }
+});
     </script>
     <script type="module" src="profilepic.js"></script>
 </body>
