@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - ConnectLocal</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .container {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
+        text-align: center;
+      }
+      .logo {
+        max-width: 120px;
+        margin-bottom: 20px;
+      }
+      h3 {
+        color: #333;
+        font-size: 22px;
+        margin-bottom: 25px;
+        font-weight: 600;
+      }
+      label {
+        display: block;
+        text-align: left;
+        margin-bottom: 5px;
+        color: #555;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      input {
+        width: 100%;
+        padding: 12px 15px;
+        margin-bottom: 18px;
+        border: 1px solid #e1e1e1;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+      }
+      input:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+      .password-container {
+        position: relative;
+        width: 100%;
+      }
+      .password-container input {
+        padding-right: 40px;
+      }
+      .password-container i {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        color: #777;
+        cursor: pointer;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .form p {
+        margin: 15px 0;
+        font-size: 14px;
+        color: #666;
+      }
+      .form a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+      }
+      .form a:hover {
+        color: #2980b9;
+      }
+      .btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 12px 20px;
+        width: 100%;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .btn:hover {
+        background-color: #2980b9;
+      }
+      hr {
+        margin: 25px auto;
+        border: none;
+        height: 1px;
+        background-color: #e1e1e1;
+        width: 80px;
+      }
+      .social-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        flex-direction: row;
+      }
+      .social-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 15px;
+        border: 1px solid #e1e1e1;
+        border-radius: 6px;
+        background-color: white;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        white-space: nowrap;
+      }
+      .social-btn:hover {
+        background-color: #f5f5f5;
+        transform: translateY(-2px);
+      }
+      .social-btn:first-child {
+        margin-right: 10px;
+      }
+      .social-btn i {
+        margin-right: 8px;
+        font-size: 16px;
+      }
+      .social-btn .fa-google {
+        color: #db4437;
+      }
+      .social-btn .fa-facebook {
+        color: #4267b2;
+      }
+      @media screen and (max-width: 480px) {
+        .container {
+          padding: 20px 15px;
+        }
+        h3 {
+          font-size: 20px;
+          margin-bottom: 20px;
+        }
+        .social-buttons {
+          flex-direction: column;
+        }
+        .social-btn {
+          margin-bottom: 10px;
+        }
+        .social-btn:first-child {
+          margin-right: 0;
+        }
+      }
+      @media screen and (max-width: 360px) {
+        input,
+        .btn {
+          padding: 10px 12px;
+        }
+        .logo {
+          max-width: 100px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img
+        src="img/Screenshot 2023-09-29 at 1.54.52 PM.png"
+        class="logo"
+        alt="ConnectLocal Logo"
+      />
+      <h3>Welcome Back</h3>
+      <form id="loginForm">
+        <label for="email">Email or Username</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+        />
+        <label for="password">Password</label>
+        <div class="password-container">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+          />
+          <i class="far fa-eye" id="togglePassword"></i>
+        </div>
+        <div class="form">
+          <p>
+            <a href="reset.html" id="reset">Forgot your password?</a>
+          </p>
+        </div>
+        <button class="btn" type="submit" id="submit">Sign In</button>
+        <div class="form">
+          <p>
+            Don't have an account?
+            <a href="signup.html">Create one</a>
+          </p>
+        </div>
+      </form>
+      <hr />
+      <p style="color: #777; font-size: 14px; margin-bottom: 15px">
+        Or continue with
+      </p>
+      <div class="social-buttons">
+        <button class="social-btn" id="go-btn" type="button">
+          <i class="fab fa-google"></i>
+          Google
+        </button>
+        <button class="social-btn" id="fb-btn" type="button">
+          <i class="fab fa-facebook"></i>
+          Facebook
+        </button>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        const togglePassword = document.querySelector("#togglePassword");
+        const password = document.querySelector("#password");
+        togglePassword.addEventListener("click", function (e) {
+          const type =
+            password.getAttribute("type") === "password" ? "text" : "password";
+          password.setAttribute("type", type);
+          this.classList.toggle("fa-eye");
+          this.classList.toggle("fa-eye-slash");
+        });
+      });
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
+    <script type="module" src="Login.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Catering - ConnectLocal</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #ff0000;
+        --secondary-color: #252525;
+        --light-gray: #f8f9fa;
+        --dark-gray: #343a40;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      body {
+        background-color: #f5f5f5;
+        font-family: "Work Sans", sans-serif;
+      }
+      .business-container {
+        margin: 40px auto;
+        max-width: 1200px;
+        padding: 0 15px;
+      }
+      .page-title {
+        color: var(--secondary-color);
+        font-weight: 700;
+        margin-bottom: 30px;
+        position: relative;
+        padding-bottom: 10px;
+      }
+      .page-title:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background-color: var(--primary-color);
+      }
+      .business-card {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: var(--box-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        margin-bottom: 25px;
+      }
+      .business-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
+      .business-image {
+        height: 220px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+      }
+      .business-image-container {
+        position: relative;
+        overflow: hidden;
+      }
+      .business-image-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0) 50%,
+          rgba(0, 0, 0, 0.7) 100%
+        );
+        z-index: 1;
+      }
+      .business-content {
+        padding: 20px;
+      }
+      .business-title {
+        color: var(--secondary-color);
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .business-description {
+        color: #6c757d;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      .featured-tag {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+        z-index: 2;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .business-meta {
+        display: flex;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+        margin-top: 15px;
+        color: #888;
+        font-size: 14px;
+      }
+      .meta-item {
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+      }
+      .meta-item i {
+        color: var(--primary-color);
+        margin-right: 5px;
+      }
+      .btn-more {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+        margin-top: 15px;
+      }
+      .btn-more:hover {
+        background-color: #d10000;
+      }
+      /* Responsive styles */
+      @media (max-width: 991px) {
+        .business-image {
+          height: 180px;
+        }
+      }
+      @media (max-width: 767px) {
+        .business-container {
+          margin: 30px auto;
+        }
+        .business-card {
+          margin-bottom: 20px;
+        }
+        .business-image {
+          height: 200px;
+        }
+      }
+      /* For empty state */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: var(--box-shadow);
+      }
+      .empty-state-icon {
+        font-size: 60px;
+        color: #ccc;
+        margin-bottom: 20px;
+      }
+      .empty-state-text {
+        color: #888;
+        font-size: 18px;
+        max-width: 500px;
+        margin: 0 auto 20px;
+      }
+      .empty-state-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+      .empty-state-btn:hover {
+        background-color: #d10000;
+      }
+      /* Filter section */
+      .filter-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: var(--box-shadow);
+        margin-bottom: 30px;
+      }
+      .filter-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: var(--secondary-color);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="business-container">
+      <h1 class="page-title">Featured Catering Services</h1>
+      <!-- Optional Filter Section -->
+      <div class="filter-section mb-4">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            <div class="filter-title mb-0">Filter Results</div>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm">
+              <option>All Categories</option>
+              <option>Food Catering</option>
+              <option>Beverage Service</option>
+              <option>Event Planning</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm">
+              <option>Sort By: Newest</option>
+              <option>Sort By: Popular</option>
+              <option>Sort By: Name A-Z</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <div class="d-flex justify-content-md-end">
+              <div class="btn-group" role="group">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm active"
+                >
+                  <i class="fas fa-th-large"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm">
+                  <i class="fas fa-list"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Business Listings -->
+      <div class="row" id="businessListings">
+        <!-- Sample Business Cards - Will be replaced by dynamically generated content -->
+        <div class="col-md-6 col-lg-4">
+          <div class="business-card">
+            <div class="business-image-container">
+              <div
+                class="business-image"
+                style="background-image: url('/api/placeholder/400/300')"
+              ></div>
+              <span class="featured-tag">Featured</span>
+            </div>
+            <div class="business-content">
+              <h3 class="business-title">Elite Catering Services</h3>
+              <p class="business-description">
+                Professional catering service for all your events. We specialize
+                in corporate functions, weddings, and private parties with
+                customized menus.
+              </p>
+              <div class="business-meta">
+                <div class="meta-item">
+                  <i class="far fa-clock"></i> Added 2 days ago
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-map-marker-alt"></i> Downtown
+                </div>
+              </div>
+              <button class="btn btn-more mt-3">View Details</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="business-card">
+            <div class="business-image-container">
+              <div
+                class="business-image"
+                style="background-image: url('/api/placeholder/400/300')"
+              ></div>
+            </div>
+            <div class="business-content">
+              <h3 class="business-title">Green Garden Catering</h3>
+              <p class="business-description">
+                Eco-friendly catering service using locally sourced ingredients.
+                Perfect for sustainable events and environmentally conscious
+                clients.
+              </p>
+              <div class="business-meta">
+                <div class="meta-item">
+                  <i class="far fa-clock"></i> Added 5 days ago
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-map-marker-alt"></i> West Side
+                </div>
+              </div>
+              <button class="btn btn-more mt-3">View Details</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="business-card">
+            <div class="business-image-container">
+              <div
+                class="business-image"
+                style="background-image: url('/api/placeholder/400/300')"
+              ></div>
+            </div>
+            <div class="business-content">
+              <h3 class="business-title">Flavor Fusion Catering</h3>
+              <p class="business-description">
+                Offering international cuisine with a modern twist. Our chefs
+                create custom menus blending flavors from around the world.
+              </p>
+              <div class="business-meta">
+                <div class="meta-item">
+                  <i class="far fa-clock"></i> Added 1 week ago
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-map-marker-alt"></i> North District
+                </div>
+              </div>
+              <button class="btn btn-more mt-3">View Details</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Empty State (will be shown when no businesses are available) -->
+      <div class="empty-state d-none">
+        <div class="empty-state-icon">
+          <i class="fas fa-store-slash"></i>
+        </div>
+        <h3>No Businesses Found</h3>
+        <p class="empty-state-text">
+          There are no catering businesses listed yet. Be the first to add your
+          business!
+        </p>
+        <button
+          class="empty-state-btn"
+          data-bs-toggle="modal"
+          data-bs-target="#actionModal"
+        >
+          <i class="fas fa-plus"></i> Add Your Business
+        </button>
+      </div>
+    </div>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getStorage,
+        ref as storageRef,
+        uploadBytes,
+        getDownloadURL,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        Timestamp,
+        orderBy,
+        query,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyByiwoUPA4vVstdBByIaTaz-WMVAnZaggc",
+        authDomain: "catering-connectlocal.firebaseapp.com",
+        databaseURL:
+          "https://catering-connectlocal-default-rtdb.firebaseio.com",
+        projectId: "catering-connectlocal",
+        storageBucket: "catering-connectlocal.appspot.com",
+        messagingSenderId: "813290457794",
+        appId: "1:813290457794:web:d4dc790d9a4d52765f895b",
+      };
+      const app = initializeApp(firebaseConfig);
+      const storage = getStorage(app);
+      const db = getFirestore(app);
+      // Function to format relative time
+      function formatTimeAgo(timestamp) {
+        const now = new Date();
+        const uploadTime = timestamp.toDate();
+        const diffMs = now - uploadTime;
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) {
+          return "Today";
+        } else if (diffDays === 1) {
+          return "Yesterday";
+        } else if (diffDays < 7) {
+          return `${diffDays} days ago`;
+        } else if (diffDays < 30) {
+          const weeks = Math.floor(diffDays / 7);
+          return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
+        } else {
+          const months = Math.floor(diffDays / 30);
+          return `${months} ${months === 1 ? "month" : "months"} ago`;
+        }
+      }
+      // Function to fetch and display businesses
+      async function fetchBusinesses() {
+        const listingsContainer = document.getElementById("businessListings");
+        const emptyState = document.querySelector(".empty-state");
+        try {
+          // Clear existing content
+          listingsContainer.innerHTML = "";
+          // Create a query ordered by timestamp (newest first)
+          const q = query(
+            collection(db, "uploads"),
+            orderBy("timestamp", "desc")
+          );
+          const querySnapshot = await getDocs(q);
+          // Check if we have any businesses
+          if (querySnapshot.empty) {
+            listingsContainer.classList.add("d-none");
+            emptyState.classList.remove("d-none");
+            return;
+          }
+          // We have businesses to display
+          listingsContainer.classList.remove("d-none");
+          emptyState.classList.add("d-none");
+          // Generate HTML for each business
+          querySnapshot.forEach((doc, index) => {
+            const data = doc.data();
+            const isFeatured = index < 2; // Make the first two businesses featured
+            const businessCard = document.createElement("div");
+            businessCard.className = "col-md-6 col-lg-4";
+            const timeAgo = data.timestamp
+              ? formatTimeAgo(data.timestamp)
+              : "Recently";
+            const location = data.location || "Local";
+            businessCard.innerHTML = `
+            <div class="business-card">
+              <div class="business-image-container">
+                <div class="business-image" style="background-image: url('${
+                  data.imageUrl
+                }')"></div>
+                ${
+                  isFeatured ? '<span class="featured-tag">Featured</span>' : ""
+                }
+              </div>
+              <div class="business-content">
+                <h3 class="business-title">${
+                  data.title || "Catering Service"
+                }</h3>
+                <p class="business-description">${data.text}</p>
+                <div class="business-meta">
+                  <div class="meta-item">
+                    <i class="far fa-clock"></i> Added ${timeAgo}
+                  </div>
+                  <div class="meta-item">
+                    <i class="fas fa-map-marker-alt"></i> ${location}
+                  </div>
+                </div>
+                <button class="btn btn-more mt-3">View Details</button>
+              </div>
+            </div>
+          `;
+            listingsContainer.appendChild(businessCard);
+          });
+        } catch (error) {
+          console.error("Error fetching businesses:", error);
+          listingsContainer.innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-danger">
+              Error loading businesses. Please try again later.
+            </div>
+          </div>
+        `;
+        }
+      }
+      // Initial load
+      fetchBusinesses();
+      // Add event listener for the upload modal submit button
+      document.addEventListener("DOMContentLoaded", function () {
+        const uploadBtn = document.getElementById("uploadBtn");
+        if (uploadBtn) {
+          uploadBtn.addEventListener("click", async () => {
+            const fileInput = document.getElementById("fileInput");
+            const textInput = document.getElementById("textInput").value.trim();
+            const file = fileInput.files[0];
+            if (!file || !textInput) {
+              alert("Please add both an image and description.");
+              return;
+            }
+            const fileStorageRef = storageRef(storage, `images/${file.name}`);
+            try {
+              const snapshot = await uploadBytes(fileStorageRef, file);
+              const downloadURL = await getDownloadURL(snapshot.ref);
+              await addDoc(collection(db, "uploads"), {
+                text: textInput,
+                imageUrl: downloadURL,
+                timestamp: Timestamp.now(),
+                location: "Local Area", // Default location - could be made dynamic
+              });
+              // Reload businesses after upload
+              fetchBusinesses();
+              // Close modal
+              const modal = bootstrap.Modal.getInstance(
+                document.getElementById("actionModal")
+              );
+              modal.hide();
+              // Reset form
+              document.getElementById("fileInput").value = "";
+              document.getElementById("textInput").value = "";
+            } catch (error) {
+              console.error("Error uploading:", error);
+              alert("Failed to upload. Please try again.");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
